@@ -48,7 +48,7 @@ contract DaoTests is DaoToken {
     }
 
 
-    function testVoteProposal() public {
+    function testVoteProposal_DAO() public {
         uint256 id = _createProposalForAddSub();
         uint256 proposalState1 = uint256(dao.proposalSnapshot(id));
         uint8 state1 = uint8(dao.state(id));
@@ -91,7 +91,7 @@ contract DaoTests is DaoToken {
     }
 
 
-    function fakeVoteAndSuccedOnAddSub() public {
+    function _fakeVoteAndSuccedOnAddSub() private {
         uint256 id = _createProposalForAddSub();
         uint256 proposalState1 = uint256(dao.proposalSnapshot(id));
         uint8 state1 = uint8(dao.state(id));
@@ -100,11 +100,10 @@ contract DaoTests is DaoToken {
         uint256 proposalState2 = uint256(dao.proposalSnapshot(id));
         uint8 state2 = uint8(dao.state(id));
         vm.roll(dao.proposalDeadline(id)+1);
-        //(uint256 votesAgainst, uint256 votesFor, uint256 votesAbstain) = dao.proposalVotes(id);
     }
 
-    function testExecuteOnAddSubProposal() public {
-        fakeVoteAndSuccedOnAddSub();
+    function testExecuteOnAddSubProposal_DAO() public {
+        _fakeVoteAndSuccedOnAddSub();
         address[] memory targetAdd = new address[](1);
         uint256[] memory targetVal = new uint256[](1);
         bytes[] memory targetData = new bytes[](1);
@@ -116,6 +115,6 @@ contract DaoTests is DaoToken {
         dao.queue(targetAdd, targetVal, targetData, keccak256(bytes(targetDesc)));
         vm.warp(block.timestamp+11);
         dao.execute(targetAdd, targetVal, targetData, keccak256(bytes(targetDesc)));
-        assertEq(addSub.num(), 1):
+        assertEq(addSub.num(), 1);
     }
 }
