@@ -1,13 +1,14 @@
 pragma solidity >=0.8;
 
 contract AddSub {
+    event ChangeNumber(uint256 number);
     uint8 public num;
 
     function add() public {
-        ++num;
+        emit ChangeNumber(num++);
     }
 
     function sub() public {
-        --num;
+        emit ChangeNumber(num--);
     }
 }
