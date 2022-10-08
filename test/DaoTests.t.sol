@@ -89,4 +89,33 @@ contract DaoTests is DaoToken {
         dao.castVote(_proposalHashId, 1);
         vm.stopPrank();
     }
+
+
+    function fakeVoteAndSuccedOnAddSub() public {
+        uint256 id = _createProposalForAddSub();
+        uint256 proposalState1 = uint256(dao.proposalSnapshot(id));
+        uint8 state1 = uint8(dao.state(id));
+        vm.roll(block.number+2);
+        _voteOnProposal(id);
+        uint256 proposalState2 = uint256(dao.proposalSnapshot(id));
+        uint8 state2 = uint8(dao.state(id));
+        vm.roll(dao.proposalDeadline(id)+1);
+        //(uint256 votesAgainst, uint256 votesFor, uint256 votesAbstain) = dao.proposalVotes(id);
+    }
+
+    function testExecuteOnAddSubProposal() public {
+        fakeVoteAndSuccedOnAddSub();
+        address[] memory targetAdd = new address[](1);
+        uint256[] memory targetVal = new uint256[](1);
+        bytes[] memory targetData = new bytes[](1);
+        string memory targetDesc = "Add 1 to number";
+
+        targetAdd[0] = address(addSub);
+        targetVal[0] = 0;
+        targetData[0] = abi.encodeWithSignature("add()");
+        dao.queue(targetAdd, targetVal, targetData, keccak256(bytes(targetDesc)));
+        vm.warp(block.timestamp+11);
+        dao.execute(targetAdd, targetVal, targetData, keccak256(bytes(targetDesc)));
+        assertEq(addSub.num(), 1):
+    }
 }
