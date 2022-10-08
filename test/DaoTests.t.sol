@@ -29,11 +29,15 @@ abstract contract DaoToken is TimeLockTest {
 
 contract DaoTests is DaoToken {
     DAO dao;
+    AddSub addSub;
     function setUp() public override {
         super.setUp();
+        addSub = new AddSub();
         dao = new DAO("Test DAO", 4, nft, timeLockNFTs);
         vm.startPrank(address(timeLockNFTs));
         timeLockNFTs.grantRole(timeLockNFTs.TIMELOCK_ADMIN_ROLE(), address(dao));
+        timeLockNFTs.grantRole(timeLockNFTs.PROPOSER_ROLE(), address(dao));
+        timeLockNFTs.grantRole(timeLockNFTs.EXECUTOR_ROLE(), address(dao));
         vm.stopPrank();
     }
 
@@ -62,7 +66,6 @@ contract DaoTests is DaoToken {
     }
 
     function _createProposalForAddSub() private returns (uint256) {
-        AddSub addSub = new AddSub();
         vm.startPrank(address(1));
         address[] memory targetAdd = new address[](1);
         uint256[] memory targetVal = new uint256[](1);
